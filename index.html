@@ -1,68 +1,94 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Universal AR Album</title>
+<title>AR Album</title>
 
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-<script>
-AFRAME.registerComponent('mytarget', {
-  init: function () {
+<style>
+body{
+margin:0;
+overflow:hidden;
+}
 
-    const video = document.querySelector("#SaileshpriyaVideo");
-    const target = document.querySelector("#target1");
-
-    target.addEventListener("targetFound", () => {
-      video.play();
-    });
-
-    target.addEventListener("targetLost", () => {
-      video.pause();
-    });
-
-  }
-});
-</script>
+#fullscreenVideo{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+object-fit:contain;
+background:black;
+display:none;
+z-index:9999;
+}
+</style>
 
 </head>
 
 <body>
 
-<a-scene 
-  mytarget
-  mindar-image="imageTargetSrc: ./targets.mind; maxTrack: 1;" 
-  color-space="sRGB"
-  renderer="colorManagement: true, physicallyCorrectLights"
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
+<video
+id="fullscreenVideo"
+src="./videos/Saileshpriya.mp4"
+playsinline
+webkit-playsinline
+autoplay
+
+> </video>
+
+<a-scene
+mindar-image="imageTargetSrc: ./targets.mind; maxTrack:1;"
+color-space="sRGB"
+renderer="colorManagement:true"
+vr-mode-ui="enabled:false"
+device-orientation-permission-ui="enabled:false"
+
 >
 
-<a-assets>
-<video
-id="SaileshpriyaVideo"
-src="./Saileshpriya.mp4"
-loop="true"
-crossorigin="anonymous"
-playsinline
-webkit-playsinline>
-</video>
-</a-assets>
+<a-assets></a-assets>
 
-<a-entity id="target1" mindar-image-target="targetIndex: 0">
-<a-plane
-src="#SaileshpriyaVideo"
-position="0 0 0"
-height="0.552"
-width="1"
-rotation="0 0 0">
-</a-plane>
-</a-entity>
-
-<a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+<a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
 </a-scene>
+
+<script>
+
+const video = document.getElementById("fullscreenVideo");
+const scene = document.querySelector("a-scene");
+
+const TOTAL_MARKERS = 30;
+
+function playVideo(){
+video.style.display="block";
+video.play().catch(()=>{});
+}
+
+function stopVideo(){
+video.pause();
+video.currentTime=0;
+video.style.display="none";
+}
+
+for(let i=0;i<TOTAL_MARKERS;i++){
+
+const marker=document.createElement("a-entity");
+
+marker.setAttribute("mindar-image-target",`targetIndex:${i}`);
+
+marker.addEventListener("targetFound",playVideo);
+
+marker.addEventListener("targetLost",stopVideo);
+
+scene.appendChild(marker);
+
+}
+
+</script>
 
 </body>
 </html>
